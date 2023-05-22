@@ -1,6 +1,6 @@
 <template>
     <a-drawer
-            v-model:visible="drawerVisible"
+            v-model:open="drawerVisible"
             v-bind="{...defaultProps, ...drawer, ...drawerProps}"
             @afterVisibleChange="visible=>drawerLoaded=visible"
     >
