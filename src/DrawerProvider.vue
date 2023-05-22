@@ -2,7 +2,7 @@
     <a-drawer
             v-model:open="drawerVisible"
             v-bind="{...defaultProps, ...drawer, ...drawerProps}"
-            @afterVisibleChange="visible=>drawerLoaded=visible"
+            @afterOpenChange="visible=>drawerLoaded=visible"
     >
         <component-context :context="drawerComponentContext">
             <component :is="drawerComponent" v-bind="drawerComponentProps|| {}"/>
