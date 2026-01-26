@@ -1,24 +1,24 @@
 <template>
     <a-drawer
-            v-model:open="drawerVisible"
-            v-bind="{...defaultProps, ...drawer, ...drawerProps}"
-            @afterOpenChange="visible=>drawerLoaded=visible"
+        v-model:open="drawerVisible"
+        v-bind="{...defaultProps, ...drawer, ...drawerProps}"
+        @afterOpenChange="visible=>drawerLoaded=visible"
     >
         <component-context :context="drawerComponentContext">
-            <component :is="drawerComponent" v-bind="drawerComponentProps|| {}"/>
+            <component :is="drawerComponent" v-bind="drawerComponentProps|| {}" />
         </component-context>
         <template v-if="drawerFooter" #footer>
-            <div :id="drawerFooterId"/>
+            <div :id="drawerFooterId" />
         </template>
     </a-drawer>
     <div ref="container" :class="docked" class="drawer-container">
-        <slot :close="closeDrawer"/>
+        <slot :close="closeDrawer" />
     </div>
 </template>
 
 <script setup>
-import {computed, provide, ref, shallowRef} from 'vue'
-import {generateObjectID} from "es-object-id";
+import { computed, provide, ref, shallowRef } from 'vue'
+import { generateObjectID } from "es-object-id";
 import ComponentContext from "./ComponentContext.vue";
 
 const props = defineProps({
@@ -42,11 +42,11 @@ const drawerVisible = ref(false)
 const drawerComponent = shallowRef(null)
 const drawerComponentProps = ref(null)
 const drawerComponentContext = shallowRef(null)
-const drawerFooterId = `drawer-footer-${generateObjectID()}`
+const drawerFooterId = `drawer-footer-${ generateObjectID() }`
 const drawerFooter = shallowRef(false)
 const drawerLoaded = ref(false)
 
-const openDrawer = ({props, component, componentProps, componentContext, footer = false}) => {
+const openDrawer = ({ props, component, componentProps, componentContext, footer = false }) => {
     drawerProps.value = props
     drawerComponent.value = component
     drawerComponentProps.value = componentProps
@@ -67,13 +67,13 @@ provide('drawerFooter', computed(() => drawerFooter.value))
 
 <style scoped lang="less">
 .drawer-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
 }
 
 [id^='drawer-footer-'] {
-  text-align: right;
+    text-align: right;
 }
 </style>
