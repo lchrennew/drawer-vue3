@@ -47,9 +47,9 @@ const drawerFooter = shallowRef(false)
 const drawerLoaded = ref(false)
 
 const openDrawer = ({ props, component, componentProps, componentContext, footer = false }) => {
-    drawerProps.value = props
+    drawerProps.value = props instanceof Function ? props() : props
     drawerComponent.value = component
-    drawerComponentProps.value = componentProps
+    drawerComponentProps.value = componentProps instanceof Function ? componentProps() : componentProps
     drawerComponentContext.value = componentContext ?? {}
     drawerVisible.value = true
     drawerFooter.value = footer

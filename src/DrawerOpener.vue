@@ -8,9 +8,9 @@ import { inject, onBeforeUnmount } from "vue";
 const openDrawer = inject('openDrawer')
 const closeDrawer = inject('closeDrawer')
 const props = defineProps({
-    props: Object,
+    props: [ Object, Function ],
     component: { required: true },
-    componentProps: { required: true },
+    componentProps: { type: [ Object, Function ], required: true },
     componentContext: { required: false },
     footer: { type: Boolean, default: false },
     closeOnDestroy: { type: Boolean, default: true },
