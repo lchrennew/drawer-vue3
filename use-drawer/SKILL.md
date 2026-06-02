@@ -12,6 +12,7 @@ Instructions for the agent to follow when implementing drawers using `drawer-vue
 
 ## Gotchas
 - **CRITICAL: DO NOT use programmatic ways (like `inject('openDrawer')`) to open drawers.** You MUST use the template-based `<drawer-opener>` component.
+- **CRITICAL: ALWAYS pass `:component-props` to `<drawer-opener>` even if it's an empty object `{}`**. The inner component expects props, and omitting this attribute will cause props to be undefined. If the inner component has no props, explicitly pass `:component-props="{}"`.
 - The application or the relevant parent section MUST be wrapped in `<drawer-provider>`.
 - **Multi-level drawers:** A single `<drawer-provider>` can only manage one drawer at a time. To open a drawer from inside another drawer, the inner component MUST declare its own `<drawer-provider>` to wrap the trigger/opener.
 - To render a footer, you MUST set the `footer` boolean prop on `<drawer-opener>`, and then use the `<drawer-footer>` component inside your dynamic component.
@@ -23,121 +24,43 @@ Instructions for the agent to follow when implementing drawers using `drawer-vue
 
 ## Workflow: Opening a Component in a Drawer
 
-### 1. Setup Provider (if not already done)
-Ensure `<drawer-provider>` wraps the area where the drawer should appear.
+### 1. Setup Provider
+Ensure `<drawer-provider>` wraps the area where the drawer should appear (typically at app root or layout level).
 
-```vue
-<template>
-  <drawer-provider>
-    <app-content />
-  </drawer-provider>
-</template>
+### 2. Use DrawerOpener
+Wrap your trigger element with `<drawer-opener>`:
+- Pass `:component="YourComponent"` to specify what to render inside the drawer
+- **MANDATORY**: Pass `:component-props="{ ... }"` or `:component-props="{}"` (never omit)
+- Pass `:props="{ title, width, ... }"` for Ant Design drawer configuration
+- Add `footer` boolean prop if the inner component uses `<drawer-footer>`
 
-<script setup>
-import { DrawerProvider } from 'drawer-vue3'
-</script>
-```
+### 3. Create Inner Component
+In the component that will be rendered inside the drawer:
+- Use `inject('closeDrawer')` to get the close function
+- Access passed props via `defineProps()`
+- Use `inject('key')` for componentContext values
+- Place `<drawer-footer>` at the end if needed (requires `footer: true` on opener)
 
-### 2. Usage (DrawerOpener)
-Use `<drawer-opener>` to handle opening declaratively. **Programmatic opening via `inject('openDrawer')` is strictly forbidden.**
+### 4. Multi-level Drawers (Optional)
+To open a drawer from inside another drawer:
+- Add a new `<drawer-provider>` inside the first drawer's component
+- Place `<drawer-footer>` OUTSIDE the new provider (so it attaches to the parent drawer)
 
-```vue
-<template>
-  <drawer-opener
-    :component="MyComponent"
-    :component-props="{ id: 123 }"
-    :props="{ title: 'My Drawer', width: 400 }"
-    footer
-  >
-    <template #default="{ open }">
-      <button @click="open">Open Drawer</button>
-    </template>
-  </drawer-opener>
-</template>
+## Code Examples
 
-<script setup>
-import { DrawerOpener } from 'drawer-vue3'
-import MyComponent from './MyComponent.vue'
-</script>
-```
+When you need implementation details, refer to these examples:
+- [basic-usage.md](references/basic-usage.md) - Opening a drawer with props
+- [no-props-usage.md](references/no-props-usage.md) - When inner component has no props
+- [inner-component.md](references/inner-component.md) - Creating the drawer content with footer
+- [multi-level.md](references/multi-level.md) - Nested drawers implementation
 
-### 3. Creating the Inner Component with Footer
-When creating the component to be rendered inside the drawer, you can inject `closeDrawer` and use `<drawer-footer>`:
-
-```vue
-<template>
-  <div class="my-drawer-content">
-    <p>Drawer Content Here for ID: {{ id }}</p>
-  </div>
-  <!-- Footer content teleported to the a-drawer footer slot -->
-  <drawer-footer>
-    <button @click="closeDrawer">Cancel</button>
-    <button type="primary">Submit</button>
-  </drawer-footer>
-</template>
-
-<script setup>
-import { inject } from 'vue'
-import { DrawerFooter } from 'drawer-vue3'
-
-// Access the close function
-const closeDrawer = inject('closeDrawer')
-
-// Access componentProps
-const props = defineProps({ id: Number })
-
-// Access componentContext provided by drawer-opener
-const user = inject('user')
-</script>
-
-<style scoped lang="less">
-.my-drawer-content {
-  padding: 16px;
-}
-</style>
-```
-
-### 4. Multi-level Drawers (Drawers inside Drawers)
-To open a second drawer from within the first one, wrap the trigger area in a new `<drawer-provider>`. 
-
-```vue
-<template>
-  <div class="first-drawer-content">
-    <!-- New provider for the second level drawer -->
-    <drawer-provider>
-      <drawer-opener
-        :component="SecondDrawerComponent"
-        :props="{ title: 'Second Level Drawer' }"
-      >
-        <template #default="{ open }">
-          <button @click="open">Open Second Drawer</button>
-        </template>
-      </drawer-opener>
-    </drawer-provider>
-  </div>
-  
-  <!-- Footer stays OUTSIDE the new provider to attach to the first drawer -->
-  <drawer-footer>
-    <button @click="closeDrawer">Close First Drawer</button>
-  </drawer-footer>
-</template>
-
-<script setup>
-import { inject } from 'vue'
-import { DrawerProvider, DrawerOpener, DrawerFooter } from 'drawer-vue3'
-import SecondDrawerComponent from './SecondDrawerComponent.vue'
-
-const closeDrawer = inject('closeDrawer')
-</script>
-```
-
-## Checklist for Implementing a Drawer
-- [ ] Verify `<drawer-provider>` is present in the parent component tree.
-- [ ] Use `<drawer-opener>` to wrap the trigger element. **Never use `inject('openDrawer')`.**
-- [ ] Pass the target component to `:component="TargetComponent"` on the opener.
-- [ ] Pass required inner component props via `:component-props`.
-- [ ] Pass Ant Design drawer config (like `title`, `width`) via `:props`.
-- [ ] Add the `footer` prop on `<drawer-opener>` if the inner component uses `<drawer-footer>`.
-- [ ] In the inner component, inject `closeDrawer` to close it programmatically.
-- [ ] **For multi-level drawers:** Ensure the inner component declares a new `<drawer-provider>` and that `<drawer-footer>` is placed outside of this new provider.
-- [ ] Check that component templates use kebab-case for custom tags.
+## Checklist
+- [ ] `<drawer-provider>` present in parent tree
+- [ ] Using `<drawer-opener>` (NOT `inject('openDrawer')`)
+- [ ] `:component="Component"` passed
+- [ ] **`:component-props` ALWAYS passed** (use `{}` if no props)
+- [ ] `:props="{ title, ... }"` for drawer config
+- [ ] `footer` prop set if using `<drawer-footer>`
+- [ ] Inner component injects `closeDrawer`
+- [ ] Multi-level: new provider + footer placement correct
+- [ ] kebab-case for all custom tags
