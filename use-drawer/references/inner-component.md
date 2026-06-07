@@ -1,6 +1,6 @@
-# Inner Component with Footer
+# Drawer Content: Footer and Close
 
-Example of the component that will be rendered inside the drawer.
+Shows the dynamic component rendered inside the drawer, including `closeDrawer`, `defineProps()`, and `<drawer-footer>`.
 
 ```vue
 <template>
@@ -20,11 +20,11 @@ import { inject } from 'vue'
 import { DrawerFooter } from 'drawer-vue3'
 
 const closeDrawer = inject('closeDrawer')
-const props = defineProps({ id: Number })
+const { id } = defineProps({ id: Number })
 const user = inject('user')
 
 const handleSubmit = () => {
-  console.log('Submit', props.id)
+  console.log('Submit', id)
   closeDrawer()
 }
 </script>

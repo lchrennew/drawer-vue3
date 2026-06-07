@@ -1,6 +1,14 @@
-# Multi-level Drawers
+# Nested Drawers: Reuse or Add Provider
 
-Example of opening a drawer from inside another drawer.
+Shows how to decide between reusing the current provider and adding a nested provider for a second visible drawer layer.
+
+## When to Add a New Provider
+
+- Reuse the current provider when you only need one visible drawer
+- Add a nested provider when the parent drawer must stay open and a child drawer must open on top of it
+- `drawer-opener` and `closeDrawer` always target the nearest `drawer-provider`
+
+## Correct Example
 
 ```vue
 <template>
@@ -10,13 +18,12 @@ Example of opening a drawer from inside another drawer.
     <!-- New provider for second level -->
     <drawer-provider>
       <drawer-opener
+        #="{ open }"
         :component="SecondDrawerComponent"
         :component-props="{}"
         :props="{ title: 'Second Level Drawer', width: 600 }"
       >
-        <template #default="{ open }">
-          <button @click="open">Open Second Drawer</button>
-        </template>
+        <button @click="open">Open Second Drawer</button>
       </drawer-opener>
     </drawer-provider>
   </div>
@@ -44,6 +51,23 @@ const closeDrawer = inject('closeDrawer')
 
 ## Key Points
 - **CRITICAL**: A single `<drawer-provider>` can only manage one drawer
-- To open a nested drawer, add a new `<drawer-provider>` inside the first drawer
+- Add a nested `<drawer-provider>` only when two drawer levels must coexist
 - **CRITICAL**: Place `<drawer-footer>` OUTSIDE the new provider to attach it to the parent drawer
 - If footer is inside the new provider, it will disappear when the second drawer opens
+
+## Reuse Current Provider
+
+If the nested action should replace the current drawer instead of opening a second layer, do not add another provider.
+
+```vue
+<template>
+  <drawer-opener
+    #="{ open }"
+    :component="SecondDrawerComponent"
+    :component-props="{}"
+    :props="{ title: 'Replace Current Drawer' }"
+  >
+    <button @click="open">Open Next Step</button>
+  </drawer-opener>
+</template>
+```

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "use-es": {
+      "source": "lchrennew/vue-skills",
+      "sourceType": "github",
+      "skillPath": "use-es/SKILL.md",
+      "computedHash": "42d7c17a275a71c5836cdbe7130f0620143f53c11db2d76cb5e9225609425ef6"
+    },
+    "use-slot": {
+      "source": "lchrennew/vue-skills",
+      "sourceType": "github",
+      "skillPath": "use-slot/SKILL.md",
+      "computedHash": "706bd8c5fea766e8d7502e756dec707fc7892f12b5520c51ebb155090fe5d07f"
+    }
+  }
+}

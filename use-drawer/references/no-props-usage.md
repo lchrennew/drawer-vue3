@@ -1,17 +1,16 @@
-# DrawerOpener Without Props
+# Drawer Opener: No Component Props
 
-Example when the inner component has no props.
+Shows the same opener pattern when the inner component has no props. You still MUST pass `:component-props="{}"`.
 
 ```vue
 <template>
   <drawer-opener
+    #="{ open }"
     :component="SimpleComponent"
     :component-props="{}"
     :props="{ title: 'Simple Drawer' }"
   >
-    <template #default="{ open }">
-      <button @click="open">Open</button>
-    </template>
+    <button @click="open">Open</button>
   </drawer-opener>
 </template>
 
